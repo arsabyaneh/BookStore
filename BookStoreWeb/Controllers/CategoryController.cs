@@ -19,5 +19,31 @@ namespace BookStoreWeb.Controllers
 
             return View(categories);
         }
+
+        //GET
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Category category)
+        {
+            if (category.Name == category.DisplayOder.ToString())
+            {
+                //ModelState.AddModelError("CustomError", "Category Name and DisplayName cannot exaxtly match!");
+                ModelState.AddModelError("Name", "Category Name and DisplayName cannot exaxtly match!");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _dbContext.Categories.Add(category);
+                _dbContext.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            return View(category);
+        }
     }
 }
