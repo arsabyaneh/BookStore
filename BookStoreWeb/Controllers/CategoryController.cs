@@ -45,5 +45,76 @@ namespace BookStoreWeb.Controllers
 
             return View(category);
         }
+
+        //GET
+        public IActionResult Edit(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+
+            var categoryFromDb = _dbContext.Categories.FirstOrDefault(c => c.Id == id);
+
+            if (categoryFromDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(categoryFromDb);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Category category)
+        {
+            if (category.Name == category.DisplayOder.ToString())
+            {
+                ModelState.AddModelError("Name", "Category Name and DisplayName cannot exaxtly match!");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _dbContext.Categories.Update(category);
+                _dbContext.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            return View(category);
+        }
+
+        //GET
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+
+            var categoryFromDb = _dbContext.Categories.FirstOrDefault(c => c.Id == id);
+
+            if (categoryFromDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(categoryFromDb);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePost(int? id)
+        {
+            var categoryFromDb = _dbContext.Categories.FirstOrDefault(c => c.Id == id);
+
+            if (categoryFromDb == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.Categories.Remove(categoryFromDb);
+            _dbContext.SaveChanges();
+            return RedirectToAction("Index");
+        }
     }
 }
