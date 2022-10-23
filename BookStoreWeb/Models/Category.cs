@@ -10,6 +10,8 @@ namespace BookStoreWeb.Models
         [Required]
         public string Name { get; set; }
 
+        [Display(Name = "Display Order")]
+        [Range(1, 100, ErrorMessage = "The value must be in range 1 to 100!")]
         public int DisplayOder { get; set; }
 
         public DateTime CreatedDateTime { get; set; } = DateTime.Now;
