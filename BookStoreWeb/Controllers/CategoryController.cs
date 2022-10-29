@@ -6,16 +6,16 @@ namespace BookStoreWeb.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ICategoryRepository _db;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryController(ICategoryRepository db)
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            IEnumerable<Category> categories = _db.GetAll();
+            IEnumerable<Category> categories = _unitOfWork.CategoryRepository.GetAll();
 
             return View(categories);
         }
@@ -38,8 +38,8 @@ namespace BookStoreWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                _db.Add(category);
-                _db.Save();
+                _unitOfWork.CategoryRepository.Add(category);
+                _unitOfWork.Save();
                 TempData["success"] = "Category successfully created.";
                 return RedirectToAction("Index");
             }
@@ -55,7 +55,7 @@ namespace BookStoreWeb.Controllers
                 return NotFound();
             }
 
-            var categoryFromDb = _db.GetFirstOrDefault(c => c.Id == id);
+            var categoryFromDb = _unitOfWork.CategoryRepository.GetFirstOrDefault(c => c.Id == id);
 
             if (categoryFromDb == null)
             {
@@ -76,8 +76,8 @@ namespace BookStoreWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                _db.Update(category);
-                _db.Save();
+                _unitOfWork.CategoryRepository.Update(category);
+                _unitOfWork.Save();
                 TempData["success"] = "Category successfully updated.";
                 return RedirectToAction("Index");
             }
@@ -93,7 +93,7 @@ namespace BookStoreWeb.Controllers
                 return NotFound();
             }
 
-            var categoryFromDb = _db.GetFirstOrDefault(c => c.Id == id);
+            var categoryFromDb = _unitOfWork.CategoryRepository.GetFirstOrDefault(c => c.Id == id);
 
             if (categoryFromDb == null)
             {
@@ -107,15 +107,15 @@ namespace BookStoreWeb.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeletePost(int? id)
         {
-            var categoryFromDb = _db.GetFirstOrDefault(c => c.Id == id);
+            var categoryFromDb = _unitOfWork.CategoryRepository.GetFirstOrDefault(c => c.Id == id);
 
             if (categoryFromDb == null)
             {
                 return NotFound();
             }
 
-            _db.Remove(categoryFromDb);
-            _db.Save();
+            _unitOfWork.CategoryRepository.Remove(categoryFromDb);
+            _unitOfWork.Save();
             TempData["success"] = "Category successfully deleted.";
             return RedirectToAction("Index");
         }
