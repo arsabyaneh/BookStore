@@ -11,10 +11,13 @@ namespace BookStore.DataAccess.Repository
         {
             _dbContext = dbContext;
 
-            CategoryRepository = new CategoryRepository(dbContext);
+            CategoryRepository  = new CategoryRepository(dbContext);
+            CoverTypeRepository = new CoverTypeRepository(dbContext);
         }
 
         public ICategoryRepository CategoryRepository { get; private set; }
+
+        public ICoverTypeRepository CoverTypeRepository { get; private set; }
 
         public void Save()
         {
