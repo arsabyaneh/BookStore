@@ -1,5 +1,6 @@
 ﻿using BookStore.DataAccess.Repository.Contracts;
 using BookStore.Models;
+using BookStore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -25,32 +26,34 @@ namespace BookStoreWeb.Areas.Admin.Controllers
         //GET
         public IActionResult Upsert(int? id)
         {
-            IEnumerable<SelectListItem> categoryList = _unitOfWork.CategoryRepository.GetAll().Select(x =>
+            var productVM = new ProductViewModel()
             {
-                return new SelectListItem()
+                Product = new(),
+                CategoryList = _unitOfWork.CategoryRepository.GetAll().Select(x =>
                 {
-                    Text = x.Name,
-                    Value = x.Id.ToString()
-                };
-            });
-
-            IEnumerable<SelectListItem> coverTypeList = _unitOfWork.CoverTypeRepository.GetAll().Select(x =>
-            {
-                return new SelectListItem()
+                    return new SelectListItem()
+                    {
+                        Text = x.Name,
+                        Value = x.Id.ToString()
+                    };
+                }),
+                CoverTypeList = _unitOfWork.CoverTypeRepository.GetAll().Select(x =>
                 {
-                    Text = x.Name,
-                    Value = x.Id.ToString()
-                };
-            });
+                    return new SelectListItem()
+                    {
+                        Text = x.Name,
+                        Value = x.Id.ToString()
+                    };
+                })
+            };
 
             if (id == null || id == 0)
             {
-                Product product = new();
+                //Product product = new();
+                //ViewBag.categoryList = categoryList;
+                //ViewData["coverTypeList"] = coverTypeList;
 
-                ViewBag.categoryList = categoryList;
-                ViewData["coverTypeList"] = coverTypeList;
-
-                return View(product);
+                return View(productVM);
             }
             else
             {
