@@ -10,10 +10,12 @@ namespace BookStoreWeb.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(IUnitOfWork unitOfWork)
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -70,17 +72,33 @@ namespace BookStoreWeb.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(Product product, IFormFile file)
+        public IActionResult Upsert(ProductViewModel productVM, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.ProductRepository.Update(product);
+                if (file != null)
+                {
+                    string wwwRootPath = _webHostEnvironment.WebRootPath;
+                    string fileName = Guid.NewGuid().ToString();
+                    string uploads = Path.Combine(wwwRootPath, @"images\products");
+                    string fileExtension = Path.GetExtension(file.FileName);
+                    string filePath = Path.Combine(uploads, fileName + fileExtension);
+
+                    using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    productVM.Product.ImageUrl = @"\images\products\" + fileName + fileExtension;
+                }
+
+                _unitOfWork.ProductRepository.Update(productVM.Product);
                 _unitOfWork.Save();
                 TempData["success"] = "Product successfully updated.";
                 return RedirectToAction("Index");
             }
 
-            return View(product);
+            return View(productVM);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookStore.Models
@@ -35,6 +36,7 @@ namespace BookStore.Models
         [Range(1, 10000)]
         public double Price100 { get; set; }
 
+        [ValidateNever]
         public string ImageUrl { get; set; }
 
         [Display(Name = "Category")]
@@ -42,6 +44,7 @@ namespace BookStore.Models
         public int CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
+        [ValidateNever]
         public Category Category { get; set; }
 
         [Display(Name = "Cover Type")]
@@ -49,6 +52,7 @@ namespace BookStore.Models
         public int CoverTypeId { get; set; }
 
         [ForeignKey("CoverTypeId")]
+        [ValidateNever]
         public CoverType CoverType { get; set; }
     }
 }
