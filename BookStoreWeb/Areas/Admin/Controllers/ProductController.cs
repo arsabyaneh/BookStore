@@ -70,7 +70,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(Product product)
+        public IActionResult Upsert(Product product, IFormFile file)
         {
             if (ModelState.IsValid)
             {
