@@ -20,9 +20,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            IEnumerable<Product> products = _unitOfWork.ProductRepository.GetAll();
-
-            return View(products);
+            return View();
         }
 
         //GET
@@ -84,7 +82,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                     string fileExtension = Path.GetExtension(file.FileName);
                     string filePath = Path.Combine(uploads, fileName + fileExtension);
 
-                    using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
@@ -92,13 +90,35 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                     productVM.Product.ImageUrl = @"\images\products\" + fileName + fileExtension;
                 }
 
-                _unitOfWork.ProductRepository.Update(productVM.Product);
-                _unitOfWork.Save();
-                TempData["success"] = "Product successfully updated.";
+                if (productVM.Product.Id == 0)
+                {
+                    _unitOfWork.ProductRepository.Add(productVM.Product);
+                    _unitOfWork.Save();
+                    TempData["success"] = "Product successfully created.";
+                }
+                else
+                {
+                    _unitOfWork.ProductRepository.Update(productVM.Product);
+                    _unitOfWork.Save();
+                    TempData["success"] = "Product successfully updated.";
+                }
+
                 return RedirectToAction("Index");
             }
 
             return View(productVM);
         }
+
+        #region API CALLS
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var products = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category,CoverType");
+
+            return Json(new { data = products });
+        }
+
+        #endregion
     }
 }
