@@ -64,7 +64,9 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                     return NotFound();
                 }
 
-                return View(productFromDb);
+                productVM.Product = productFromDb;
+
+                return View(productVM);
             }
         }
 
@@ -81,6 +83,16 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                     string uploads = Path.Combine(wwwRootPath, @"images\products");
                     string fileExtension = Path.GetExtension(file.FileName);
                     string filePath = Path.Combine(uploads, fileName + fileExtension);
+
+                    if (productVM.Product.ImageUrl != null)
+                    {
+                        string oldFilePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
