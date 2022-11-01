@@ -131,6 +131,32 @@ namespace BookStoreWeb.Areas.Admin.Controllers
             return Json(new { data = products });
         }
 
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            var productFromDb = _unitOfWork.ProductRepository.GetFirstOrDefault(c => c.Id == id);
+
+            if (productFromDb == null)
+            {
+                return Json(new { success = false, message = "Error while deleting product!" });
+            }
+
+            if (productFromDb.ImageUrl != null)
+            {
+                string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, productFromDb.ImageUrl.TrimStart('\\'));
+
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    System.IO.File.Delete(oldFilePath);
+                }
+            }
+
+            _unitOfWork.ProductRepository.Remove(productFromDb);
+            _unitOfWork.Save();
+
+            return Json(new { success = true, message = "Product successfully deleted." });
+        }
+
         #endregion
     }
 }
